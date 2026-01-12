@@ -117,22 +117,36 @@ Kurzfassung: **kontrollierte Zerstörung**.
 Im Script kannst du brutal experimentieren:
 
 ```python
-"-bsf:v", "noise=amount=9000*not(key)"
+
+    noise_amount = 9000		# zB. 1000-9000 Intensität der Zerfickung
+    x264params = [
+        "keyint=500", 		# Resettet immer wieder das Ausgangsbild, damit es nicht zu sehr abkackt
+        "keyint_min=60",
+        "bf=8",				# z.B. 0-8 Nachzieheffekte, die Optik schmiert wie auf Pappe
+        "partitions=none" 	# macht es etwas hübscher
+    ]
+    
+    corrupt_cmd = [
+        "ffmpeg", "-y",
+        "-i", str(input_file),
+        "-c:v", "libx264",
+        "-x264-params",  ":".join(x264params), 
+        "-bsf:v", f"noise=amount={noise_amount}*not(key)", 
+        "-pix_fmt", "yuv420p",
+        str(corrupted_temp)
+    ]
+
 ```
 
-- `amount` = Rauschen bringt mehr Zerstörung
-- `keyint` = resettet immer wieder das Ausgangsbild, damit es nicht zu sehr abkackt
-- `bf` (0–8) = Nachzieheffekte, die Optik schmiert wie auf Pappe
-
-Zu viel = kaputte Datei  
-Zu wenig = langweilig
+Zu viel Zerfickung  = kaputte Datei  
+Zu wenig Zerfickung = langweilige Datei
 
 ---
 
 ## Haftungsausschluss
 
 - Dieses Script **zerstört absichtlich Videodaten**
-- Nutze **Kopien**, niemals Originale
+- Nutze **Kopien**, niemals Originale aber ist auch nicht schlimm. Ist dann vielleicht weg.
 - Ergebnisse sind nicht deterministisch
 - Glitch-Art halt
 
@@ -141,5 +155,5 @@ Zu wenig = langweilig
 ## Warum?
 
 Warum nicht?
-![Meme mit Pizzajungen]
-(https://media1.tenor.com/m/14hr1KPxcCoAAAAd/community-donald-glover.gif)
+
+![Meme mit Pizzajungen](https://c.tenor.com/14hr1KPxcCoAAAAd/tenor.gif)

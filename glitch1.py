@@ -56,12 +56,20 @@ def process_video(input_file: Path, output_dir: Path) -> None:
     print(f"-> Bearbeite: {input_file.name} (h264)")
 
     # Schritt 2: Korruption mit Noise in Non-Keyframes
+    noise_amount = 9000		# zB. 1000-9000 Intensität der Zerfickung
+    x264params = [
+        "keyint=500", 		# Resettet immer wieder das Ausgangsbild, damit es nicht zu sehr abkackt
+        "keyint_min=60",
+        "bf=8",				# z.B. 0-8 Nachzieheffekte, die Optik schmiert wie auf Pappe
+        "partitions=none" 	# macht es etwas hübscher
+    ]
+    
     corrupt_cmd = [
         "ffmpeg", "-y",
         "-i", str(input_file),
         "-c:v", "libx264",
-        "-x264-params", "keyint=500:keyint_min=60:bf=8:partitions=none", # keyint ändert die Keyframes, bf 0-8 =nachzieheffekte
-        "-bsf:v", "noise=amount=9000*not(key)", # noise = amount der Zerfickung
+        "-x264-params",  ":".join(x264params), 
+        "-bsf:v", f"noise=amount={noise_amount}*not(key)", 
         "-pix_fmt", "yuv420p",
         str(corrupted_temp)
     ]
